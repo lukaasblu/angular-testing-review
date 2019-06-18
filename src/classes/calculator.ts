@@ -7,6 +7,9 @@ export default class Calculator {
   }
 
   evaluate(expression: string): number {
-    throw new Error('Evaluate method not implemented.');
+
+    return expression.split('+')
+      .map(rawValue => parseInt(rawValue, 10))
+      .reduce((result, value) => result + value, 0);
   }
 }
