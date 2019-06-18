@@ -1,4 +1,4 @@
-import Calculator from './calculator';
+import Calculator from '../classes/calculator';
 
 describe('Calculator', () => {
   let calc: Calculator;
