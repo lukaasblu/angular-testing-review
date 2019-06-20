@@ -1,15 +1,29 @@
 import { PickyWeatherStationService } from '../services/picky-weather-station.service';
-import { TestBed, fakeAsync, flush } from '@angular/core/testing';
+import { TestBed, fakeAsync, flush, async } from '@angular/core/testing';
 import { Geolocation } from '../services/geolocation.service';
 import { of } from 'rxjs';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('PickyWeatherStation', () => {
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    }).compileComponents();
+  }));
 
   let geolocation: Geolocation;
   beforeEach(() => geolocation = TestBed.get(Geolocation));
 
   let weatherStation: PickyWeatherStationService;
   beforeEach(() => weatherStation = TestBed.get(PickyWeatherStationService));
+
+  let httpTestingController: HttpTestingController;
+  beforeEach(() => httpTestingController = TestBed.get(HttpTestingController));
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
   xit('should give temperature', fakeAsync(() => {
     let temperature;
@@ -43,5 +57,18 @@ describe('PickyWeatherStation', () => {
 
     expect(geolocation.getCoordinates).toHaveBeenCalledTimes(1);
     expect(geolocation.getCoordinates).toHaveBeenCalledWith('Tokyo');
+  }));
+
+  it('should get temperature from API', fakeAsync(() => {
+    let temperature: number;
+
+    weatherStation.getTemperature('Tokyo')
+      .subscribe(res => temperature = res);
+
+    const req = httpTestingController.expectOne('/city-weather/tokyo');
+
+    req.flush({ temperature: 30});
+
+    expect(temperature).toEqual(30);
   }));
 });
